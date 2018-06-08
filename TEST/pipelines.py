@@ -49,6 +49,7 @@ class TestPipeline(object):
     #         print(error)
     #     return item
     def process_item(self,item,spider):
+        #数据库信息在settings.py配置
         self.host = settings['DB_HOST']
         self.port = settings['DB_PORT']
         self.user = settings['DB_USER']
@@ -59,6 +60,7 @@ class TestPipeline(object):
                                charset=self.charset)
         cue = conn.cursor()
         try:
+            #将爬去数据的结果导入表result中
             cue.execute("insert into result(title,link) values(%s, %s);", [item['title'], item['link']])
             print("insert success")  # 测试语句
         except Exception as e:
@@ -67,6 +69,7 @@ class TestPipeline(object):
         else:
             conn.commit()
         try:
+            #从result表中找到最后一行的数据进行分词
             cue.execute("SELECT * FROM result ORDER BY `index` DESC LIMIT 1")
             result = cue.fetchall()
             seg_list = jieba.analyse.extract_tags(result[0][1],topK=20,withWeight=True)
@@ -89,6 +92,7 @@ class TestPipeline(object):
                                charset=charset)
         cue = conn.cursor()
         try:
+            #将分词结果建立索引，导入索引表中
             cue.execute("insert into `index`(`id`,`keyword`,`tf-idf`)values(%s,%s,%s);",[index_, keyword, tf_idf])
         except Exception as e:
             print("insert error", e)

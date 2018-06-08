@@ -18,6 +18,7 @@ def shouye():
     return render_template("index.html")
 @app.route('/s')
 def search():
+    #获取关键字
     keyword = request.args.get('wd')
     host = DB_HOST
     port = DB_PORT
@@ -33,6 +34,7 @@ def search():
         result = cue.fetchall()
     except Exception as e:
         print('select1 error', e)
+    #构造sql查询语句
     sqlstr = ""
     for i in range(0, len(result)):
         str = "'" + "".join(result[i]) + "'"
